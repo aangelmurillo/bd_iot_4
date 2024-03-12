@@ -1,4 +1,4 @@
-/*DROP IF EXISTS DATABASE ihelmet;*/
+DROP DATABASE IF EXISTS ihelmet;
 CREATE DATABASE IF NOT EXISTS ihelmet CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE ihelmet;
@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS roles (
     role_name VARCHAR(255) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS address (
+CREATE TABLE IF NOT EXISTS addresses (
     address_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
     street VARCHAR(255) NOT NULL,
     exterior_number VARCHAR(20) NOT NULL,
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS notifications (
     FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
 );
 
-CREATE TABLE IF NOT EXISTS persons (
+CREATE TABLE IF NOT EXISTS people (
     person_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
     first_name VARCHAR(40) NOT NULL,
     last_name VARCHAR(40) NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS persons (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
-    FOREIGN KEY (address_id) REFERENCES address(address_id)
+    FOREIGN KEY (address_id) REFERENCES addresses(address_id)
 );
 
 CREATE TABLE IF NOT EXISTS users (
@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS users (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(rol_id),
-    FOREIGN KEY (person_id) REFERENCES persons(person_id),
+    FOREIGN KEY (person_id) REFERENCES people(person_id),
     FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
 );
 
