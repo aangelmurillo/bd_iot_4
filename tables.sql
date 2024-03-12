@@ -1,88 +1,97 @@
--- usuarios
-CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_email VARCHAR(255),
-    user_password VARCHAR(255),
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL
+CREATE DATABASE IF NOT EXISTS iHelmet CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+USE iHelmet;
+
+CREATE TABLE IF NOT EXISTS ROLES (
+    rol_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    rol VARCHAR(255) NOT NULL
 );
 
--- Trabjadores/mineros
-CREATE TABLE workers (
-    worker_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    worker_name VARCHAR(255),
-    worker_position VARCHAR(255), -- en caso de que tengamos admin
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id)
+CREATE TABLE IF NOT EXISTS ADDRESS (
+    address_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    calle VARCHAR(255) NOT NULL,
+    num_exterior VARCHAR(20) NOT NULL,
+    num_interior VARCHAR(20) NOT NULL,
+    colonia VARCHAR(255) NOT NULL,
+    cp VARCHAR(10) NOT NULL,
+    municipio VARCHAR(40) NOT NULL,
+    estado VARCHAR(40) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
--- calidad de aire MQ135
-CREATE TABLE air_sensor (
-    air_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    air_sensor_quality INT,   -- segun como lo interpretemos 0 bien y 100 mal, talvez poner un estado con trigger
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS CASCOS (
+    casco_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    casco_num_serie VARCHAR(30) NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP
 );
 
--- gps SIM808
-CREATE TABLE gps_sensor (
-    gps_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    gps_sensor_latitude DOUBLE,
-    gps_sensor_longitude DOUBLE,
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS NOTIFICACIONES (
+    notificacion_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    nombre_sensor VARCHAR(50) NOT NULL,
+    advertencia VARCHAR(255) NOT NULL,
+    casco_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (casco_id) REFERENCES CASCOS(casco_id)
 );
 
---  ultrasOnico HC-SR04
-CREATE TABLE ultrasonic_sensor (
-    ultrasonic_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    ultrasonic_sensor_object_distance INT,  -- aqui distancia de cm
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS PERSONAS (
+    persona_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    nombre VARCHAR(40) NOT NULL,
+    apellido_pa VARCHAR(40) NOT NULL,
+    apellido_ma VARCHAR(40),
+    curp VARCHAR(18) UNIQUE NOT NULL,
+    nss VARCHAR(15) UNIQUE NOT NULL,
+    rfc VARCHAR(14) UNIQUE NOT NULL,
+    fecha_nacimiento DATE NOT NULL,
+    telefono VARCHAR(30) NOT NULL UNIQUE,
+    telefono_emergencia VARCHAR(15) NOT NULL,
+    id_address INT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (id_address) REFERENCES ADDRESS(address_id)
 );
 
--- temperatura DS18B20
-CREATE TABLE temperature_sensor (
-    temperature_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    temperature_sensor_temperature DOUBLE,
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS USUARIOS (
+    usuario_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    usuario_correo VARCHAR(255) NOT NULL UNIQUE,
+    usuario_contrasena VARCHAR(255) NOT NULL,
+    usuario_nombre VARCHAR(20) NOT NULL UNIQUE,
+    rol_id INT NOT NULL,
+    persona_id INT NOT NULL UNIQUE,
+    casco_id INT NOT NULL UNIQUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (rol_id) REFERENCES ROLES(rol_id),
+    FOREIGN KEY (persona_id) REFERENCES PERSONAS(persona_id),
+    FOREIGN KEY (casco_id) REFERENCES CASCOS(casco_id)
 );
 
--- humo MQ-2
-CREATE TABLE smoke_sensor (
-    smoke_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    smoke_sensor_level INT,  -- nivel de humo
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS SENSOR_GPS (
+    sensor_gps_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    sensor_gps_coordenadas VARCHAR(255),
+    sensor_gps_altura DECIMAL(10,2),
+    casco_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (casco_id) REFERENCES CASCOS(casco_id)
 );
 
--- Humedad de tierra FC-28
-CREATE TABLE humidity_sensor (
-    humidity_sensor_id INT PRIMARY KEY AUTO_INCREMENT,
-    worker_id INT,
-    humidity_sensor_soil_humidity INT,  -- aqui la humedad de la tierra
-    created_at TIMESTAMP NULL,
-	updated_at TIMESTAMP NULL,
-	deleted_at TIMESTAMP NULL,
-    FOREIGN KEY (worker_id) REFERENCES Workers(worker_id)
+CREATE TABLE IF NOT EXISTS SENSOR_MICROFONO (
+    sensor_microfono_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
+    sensor_microfono_audio VARCHAR(255),
+    usuario_id INT NOT NULL,
+    casco_id INT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    deleted_at TIMESTAMP,
+    FOREIGN KEY (usuario_id) REFERENCES USUARIOS(usuario_id),
+    FOREIGN KEY (casco_id) REFERENCES CASCOS(casco_id)
 );
