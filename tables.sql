@@ -5,18 +5,19 @@ USE ihelmet;
 
 CREATE TABLE IF NOT EXISTS roles (
     rol_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    role_name VARCHAR(255) NOT NULL
+    rol_name VARCHAR(50) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS addresses (
     address_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    street VARCHAR(255) NOT NULL,
-    exterior_number VARCHAR(20) NOT NULL,
-    interior_number VARCHAR(20),
+    street VARCHAR(70) NOT NULL,
+    exterior_number VARCHAR(5) NOT NULL,
+    interior_number VARCHAR(5),
     neighborhood VARCHAR(150) NOT NULL,
-    postal_code VARCHAR(10) NOT NULL,
-    municipality VARCHAR(40) NOT NULL,
+    zip_code VARCHAR(10) NOT NULL,
+    city VARCHAR(40) NOT NULL,
     state VARCHAR(40) NOT NULL,
+    country VARCHAR(40) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
     deleted_at TIMESTAMP
