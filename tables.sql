@@ -31,25 +31,12 @@ CREATE TABLE IF NOT EXISTS helmets (
     deleted_at TIMESTAMP
 );
 
-CREATE TABLE IF NOT EXISTS notifications (
-    notification_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    sensor_name VARCHAR(50) NOT NULL,
-    warning_message VARCHAR(255) NOT NULL,
-    helmet_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP,
-    FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
-);
-
 CREATE TABLE IF NOT EXISTS people (
     person_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
     first_name VARCHAR(40) NOT NULL,
     last_name VARCHAR(40) NOT NULL,
     second_last_name VARCHAR(40),
     curp VARCHAR(18) UNIQUE NOT NULL,
-    nss VARCHAR(15) UNIQUE NOT NULL,
-    rfc VARCHAR(14) UNIQUE NOT NULL,
     date_of_birth DATE NOT NULL,
     phone_number VARCHAR(30) NOT NULL UNIQUE,
     emergency_phone_number VARCHAR(30) NOT NULL,
@@ -74,27 +61,5 @@ CREATE TABLE IF NOT EXISTS users (
     deleted_at TIMESTAMP,
     FOREIGN KEY (role_id) REFERENCES roles(rol_id),
     FOREIGN KEY (person_id) REFERENCES people(person_id),
-    FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
-);
-
-CREATE TABLE IF NOT EXISTS gps_sensors (
-    gps_sensor_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    gps_coordinates VARCHAR(255),
-    gps_altitude DECIMAL(10,2),
-    helmet_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP,
-    FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
-);
-
-CREATE TABLE IF NOT EXISTS microphone_sensors (
-    microphone_sensor_id INT AUTO_INCREMENT PRIMARY KEY UNIQUE NOT NULL,
-    microphone_audio VARCHAR(255),
-    user_id INT NOT NULL,
-    helmet_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    deleted_at TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(user_id),
     FOREIGN KEY (helmet_id) REFERENCES helmets(helmet_id)
 );
